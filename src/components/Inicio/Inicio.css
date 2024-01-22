@@ -1,0 +1,16 @@
+.inicioContainer{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 3vw 0;
+}
+
+.inicioTitle{
+    color: white;
+    font-size: 60px;
+}
+
+.inicioInfo{
+    color: white;
+    font-size: 30px;
+}

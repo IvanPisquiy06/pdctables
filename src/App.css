@@ -1,5 +1,8 @@
 .App {
   text-align: center;
+  background-image: url('../public/polygon.svg');
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 .App-logo {
