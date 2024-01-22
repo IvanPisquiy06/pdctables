@@ -58,13 +58,15 @@ export default function Pais() {
         <button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
+          className='Btn'
         >
           Previous
         </button>
-        <span>{`Page ${currentPage}`}</span>
+        <span className='page'>{`Page ${currentPage}`}</span>
         <button
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={endIndex >= data.length}
+          className='Btn'
         >
           Next
         </button>

@@ -47,7 +47,7 @@ export default function Persona() {
 
   return (
     <div className='paisContainer'>
-      <h2 className='paisTitle'>Tabla Departamentos</h2>
+      <h2 className='paisTitle'>Tabla Personas</h2>
       <button onClick={getData} className='btnRefresh'>
         Refrescar
       </button>
@@ -78,13 +78,15 @@ export default function Persona() {
         <button
           onClick={() => handlePageChange(currentPage - 1)}
           disabled={currentPage === 1}
+          className='prev Btn'
         >
           Previous
         </button>
-        <span>{`Page ${currentPage}`}</span>
+        <span className='page'>{`Page ${currentPage}`}</span>
         <button
           onClick={() => handlePageChange(currentPage + 1)}
           disabled={endIndex >= data.length}
+          className='next Btn'
         >
           Next
         </button>

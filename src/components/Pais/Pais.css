@@ -3,6 +3,7 @@
     flex-direction: column;
     align-items: center;
     min-height:40vw;
+    padding-bottom: 7vw;
 }
 
 .paisTitle{
