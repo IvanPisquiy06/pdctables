@@ -1,54 +1,74 @@
-import './Pais.css';
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import './Pais.css'
 
-export default function Pais(){
+export default function Pais() {
+  const [data, setData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
-    function getData(){
-        fetch('http://192.168.0.5/pdcpersona/getTabPais.php',{
-        })
-            .then(response => response.json())
-            .then(data => {
-                fillTable(data)
-            })
-            .catch(error => console.error('Error fetching data:', error));
-    }
+  useEffect(() => {
+    getData();
+  }, [currentPage]);
 
-    async function fillTable(data){
+  function getData() {
+    fetch('https://0y3taspim4.execute-api.us-east-2.amazonaws.com/data/', {
+      method: 'POST',
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        setData(data.body);
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }
 
-        console.log(data);
+  // Calculate the range of items to display for the current page
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const displayedRows = data.slice(startIndex, endIndex);
 
-        var tableBody = document.getElementById('tableBody');
+  // Function to handle pagination
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
 
-        // Iterate through the JSON data and populate the table
-        data.forEach(function(item) {
-            var row = document.createElement('tr');
-            
-            // Add Pais column
-            var paisCell = document.createElement('td');
-            paisCell.textContent = item.Pais;
-            row.appendChild(paisCell);
+  return (
+    <div className='paisContainer'>
+      <h2 className='paisTitle'>Tabla Pais</h2>
+      <button onClick={getData} className='btnRefresh'>
+        Refrescar
+      </button>
+      <table>
+        <thead>
+          <tr>
+            <th>Pais</th>
+            <th>Nombre del Pais</th>
+          </tr>
+        </thead>
+        <tbody>
+          {displayedRows.map((row, index) => (
+            <tr key={index}>
+              <td>{row[0]}</td>
+              <td>{row[1]}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-            // Add NomPais column
-            var nomPaisCell = document.createElement('td');
-            nomPaisCell.textContent = item.NomPais;
-            row.appendChild(nomPaisCell);
-
-            // Append the row to the table body
-            tableBody.appendChild(row);
-        });
-    }
-
-    return <div className='paisContainer'>
-        <h2 className='paisTitle'>Tabla Pais</h2>
-        <button onClick={getData} className='btnRefresh'>Refrescar</button>
-        <table>
-            <thead>
-                <tr>
-                    <th>Pais</th>
-                    <th>NomPais</th>
-                </tr>
-            </thead>
-            <tbody id='tableBody'></tbody>
-        </table>
+      <div>
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        <span>{`Page ${currentPage}`}</span>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={endIndex >= data.length}
+        >
+          Next
+        </button>
+      </div>
     </div>
+  );
 }

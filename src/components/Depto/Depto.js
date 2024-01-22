@@ -1,58 +1,93 @@
-import './Depto.css';
+import React, { useState, useEffect } from 'react';
 
 export default function Depto() {
+  const [data, setData] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const pais = 'GT';
 
-    function getData(){
-        fetch('http://192.168.0.5/pdcpersona/getTabDepto.php',{
-        })
-            .then(response => response.json())
-            .then(data => {
-                fillTable(data)
-            })
-            .catch(error => console.error('Error fetching data:', error));
-    }
+  useEffect(() => {
+    getData();
+  }, [currentPage]);
 
-    async function fillTable(data){
+  function getData() {
+    const requestBody = {
+      Pais: pais,
+    };
 
-        console.log(data);
+    fetch('https://0y3taspim4.execute-api.us-east-2.amazonaws.com/data/GetDeptos', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(requestBody),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (data.body && data.body.length > 0) {
+          setData(data.body);
+        } else {
+          console.error('Empty or invalid data received');
+        }
+      })
+      .catch((error) => console.error('Error fetching data:', error));
+  }
 
-        var tableBody = document.getElementById('tableBody');
+  // Calculate the range of items to display for the current page
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const displayedRows = data.slice(startIndex, endIndex);
 
-        // Iterate through the JSON data and populate the table
-        data.forEach(function(item) {
-            var row = document.createElement('tr');
-            
-            // Add Pais column
-            var paisCell = document.createElement('td');
-            paisCell.textContent = item.Pais;
-            row.appendChild(paisCell);
+  // Function to handle pagination
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+  };
 
-            // Add NomPais column
-            var DeptoCell = document.createElement('td');
-            DeptoCell.textContent = item.Depto;
-            row.appendChild(DeptoCell);
-
-            var nomDeptoCell = document.createElement('td');
-            nomDeptoCell.textContent = item.NomDepto;
-            row.appendChild(nomDeptoCell);
-
-            // Append the row to the table body
-            tableBody.appendChild(row);
-        });
-    }
-
-    return <div className='paisContainer'>
-    <h2 className='paisTitle'>Tabla Departamento</h2>
-    <button onClick={getData} className='btnRefresh'>Refrescar</button>
-    <table>
+  return (
+    <div className='paisContainer'>
+      <h2 className='paisTitle'>Tabla Departamentos</h2>
+      <button onClick={getData} className='btnRefresh'>
+        Refrescar
+      </button>
+      <table>
         <thead>
-            <tr>
-                <th>Pais</th>
-                <th>Depto</th>
-                <th>NomDepto</th>
-            </tr>
+          <tr>
+            <th>Pais</th>
+            <th>Depto</th>
+            <th>Nombre del Departamento</th>
+          </tr>
         </thead>
-        <tbody id='tableBody'></tbody>
-    </table>
-</div>
+        <tbody>
+          {displayedRows.map((row, index) => (
+            <tr key={index}>
+              <td>{row.Pais}</td>
+              <td>{row.Depto}</td>
+              <td>{row.NomDepto}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+
+      <div>
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+        >
+          Previous
+        </button>
+        <span>{`Page ${currentPage}`}</span>
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={endIndex >= data.length}
+        >
+          Next
+        </button>
+      </div>
+    </div>
+  );
 }
